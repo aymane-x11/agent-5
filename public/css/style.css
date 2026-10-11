@@ -1,0 +1,119 @@
+/* AGENT-5 Unified Multi-Device Stylesheet */
+:root {
+  --bg-primary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-subtle: #f8fafc;
+  --text-primary: #09090b;
+  --text-muted: #64748b;
+  --border-subtle: #e2e8f0;
+}
+
+html.dark {
+  --bg-primary: #000000;
+  --bg-card: #0c0c0e;
+  --bg-subtle: #121215;
+  --text-primary: #ffffff;
+  --text-muted: #a1a1aa;
+  --border-subtle: #27272a;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+  overflow-x: hidden;
+}
+
+/* Custom Minimalist Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.6);
+}
+
+/* Agent Card States */
+.agent-box {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.agent-box.state-thinking {
+  border-color: #3b82f6 !important;
+  background-color: rgba(59, 130, 246, 0.06) !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+html.dark .agent-box.state-thinking {
+  border-color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+}
+
+.agent-box.state-completed {
+  border-color: rgba(16, 185, 129, 0.6) !important;
+  background-color: rgba(16, 185, 129, 0.05) !important;
+}
+
+/* Viewport Containers for Preview Studio */
+#canvas-container {
+  margin: 0 auto;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.35s ease;
+}
+
+#canvas-container.device-desktop {
+  width: 100%;
+  max-width: 100%;
+}
+
+#canvas-container.device-tablet {
+  width: 768px;
+  max-width: 100%;
+}
+
+#canvas-container.device-mobile {
+  width: 385px;
+  max-width: 100%;
+}
+
+#canvas-container.device-tv {
+  width: 100%;
+  max-width: 100%;
+  border-width: 2px;
+}
+
+/* Grid lines pattern */
+.grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+html.dark .grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+/* Interactive touch target optimization */
+button, a {
+  min-height: 38px;
+  touch-action: manipulation;
+}
+
+/* Animations */
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.animate-subtle {
+  animation: pulseSubtle 2s infinite ease-in-out;
+}

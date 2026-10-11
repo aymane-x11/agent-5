@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>AGENT-5 | المنصة المتقدمة لإنشاء المواقع بالذكاء الاصطناعي</title>
+  
+  <!-- Fonts: IBM Plex Sans Arabic, Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Cairo:wght@600;700;900&family=Alexandria:wght@600;700;900&family=Tajawal:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"IBM Plex Sans Arabic"', '"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-slate-50 text-zinc-900 dark:bg-black dark:text-white min-h-screen flex flex-col font-sans antialiased selection:bg-zinc-800 selection:text-white dark:selection:bg-white dark:selection:text-black">
+
+  <!-- Main Top Bar -->
+  <header class="h-16 sm:h-20 border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-black/95 backdrop-blur-xl sticky top-0 z-50 px-3 sm:px-6 lg:px-8 flex items-center justify-between transition-colors shadow-sm">
+    
+    <!-- Brand -->
+    <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
+      <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-black flex items-center justify-center font-black text-sm tracking-wider shadow-md">
+        A5
+      </div>
+      <div>
+        <div class="flex items-center space-x-2 rtl:space-x-reverse">
+          <span class="text-base sm:text-lg font-black tracking-tight text-zinc-950 dark:text-white">AGENT-5</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400">Gemini 3.1</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stepper Navigation (1: Concept, 2: Style, 3: Agents, 4: Preview) -->
+    <nav class="hidden md:flex items-center space-x-1 rtl:space-x-reverse bg-zinc-100 dark:bg-zinc-900/90 p-1 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">
+      <button id="step-btn-1" onclick="goToStep(1)" class="px-3.5 py-1.5 rounded-full bg-zinc-950 text-white dark:bg-white dark:text-black transition-all shadow-sm">
+        <span class="step-num">1.</span> <span data-i18n="step1Title">الفكرة واللغة</span>
+      </button>
+      <button id="step-btn-2" onclick="goToStep(2)" class="px-3.5 py-1.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-all">
+        <span class="step-num">2.</span> <span data-i18n="step2Title">النمط والألوان</span>
+      </button>
+      <button id="step-btn-3" onclick="goToStep(3)" class="px-3.5 py-1.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-all">
+        <span class="step-num">3.</span> <span data-i18n="step3Title">الوكلاء السبعة</span>
+      </button>
+      <button id="step-btn-4" onclick="goToStep(4)" class="px-3.5 py-1.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-all">
+        <span class="step-num">4.</span> <span data-i18n="step4Title">المعاينة والتصدير</span>
+      </button>
+    </nav>
+
+    <!-- Right Controls: Trilingual Switcher, Network Modal & Theme Toggle -->
+    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+      
+      <!-- Network Test Link Button (Internal Connection for Phone & Wi-Fi) -->
+      <button onclick="openNetworkInfoModal()" class="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition-all flex items-center space-x-1.5 rtl:space-x-reverse text-xs font-mono" title="معلومات الاتصال الداخلي والشبكة">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="hidden sm:inline" id="top-ip-display">Wi-Fi LAN</span>
+        <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+      </button>
+
+      <!-- Platform Language Switcher (AR / EN / FR) -->
+      <div class="relative">
+        <select id="platform-lang-select" onchange="changePlatformLanguage(this.value)" class="text-xs font-bold py-1.5 px-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+          <option value="ar">العربية 🇸🇦</option>
+          <option value="en">English 🇺🇸</option>
+          <option value="fr">Français 🇫🇷</option>
+        </select>
+      </div>
+
+      <!-- Black & White / Light & Dark Theme Toggle -->
+      <button onclick="togglePlatformTheme()" class="p-2 sm:p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition-all shadow-sm" title="تبديل الوضع الأبيض / الأسود" aria-label="Toggle Theme">
+        <i id="platform-theme-icon" data-lucide="sun" class="w-4 h-4"></i>
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- Mobile Stepper Bar -->
+  <div class="md:hidden flex items-center justify-around border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-2 py-2 text-xs font-bold">
+    <button id="m-step-btn-1" onclick="goToStep(1)" class="px-2.5 py-1 rounded-full bg-zinc-950 text-white dark:bg-white dark:text-black text-[11px]">1. الفكرة</button>
+    <button id="m-step-btn-2" onclick="goToStep(2)" class="px-2.5 py-1 rounded-full text-zinc-500 text-[11px]">2. النمط</button>
+    <button id="m-step-btn-3" onclick="goToStep(3)" class="px-2.5 py-1 rounded-full text-zinc-500 text-[11px]">3. الوكلاء</button>
+    <button id="m-step-btn-4" onclick="goToStep(4)" class="px-2.5 py-1 rounded-full text-zinc-500 text-[11px]">4. المعاينة</button>
+  </div>
+
+  <!-- Step Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 flex flex-col">
+
+    <!-- ============================================================ -->
+    <!-- STEP 1: IDEA, LANGUAGE & ARCHETYPE                           -->
+    <!-- ============================================================ -->
+    <section id="step-panel-1" class="step-panel flex-1 flex flex-col justify-center max-w-3xl mx-auto w-full py-4 sm:py-8">
+      
+      <div class="text-center mb-6 sm:mb-8">
+        <div class="inline-flex items-center space-x-2 rtl:space-x-reverse px-3.5 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-600 dark:text-zinc-400 mb-4 shadow-sm">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-500"></i>
+          <span data-i18n="badgeStep1">محرك Gemini 3.1 Flash-Lite المتكامل بسبعة وكلاء</span>
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-black text-zinc-950 dark:text-white tracking-tight mb-3" data-i18n="heroHeading">
+          ما هو الموقع الذي ترغب ببنائه؟
+        </h2>
+        <p class="text-sm sm:text-base text-zinc-600 dark:text-zinc-400" data-i18n="heroSubheading">
+          حدد اللغة والهدف، وسيقوم الوكلاء بالتخطيط الدقيق، التصميم، كتابة النصوص، والبرمجة مع التدقيق الذاتي.
+        </p>
+      </div>
+
+      <!-- Main Config Card -->
+      <div class="rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 sm:p-7 shadow-xl space-y-5">
+        
+        <!-- Target Site Language Selector -->
+        <div>
+          <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-2" data-i18n="targetLangLabel">
+            لغة الموقع المولد (Target Website Language):
+          </label>
+          <div class="grid grid-cols-3 gap-2.5">
+            <button type="button" onclick="setSiteLanguage('ar')" id="site-lang-ar" class="lang-btn py-2.5 px-3 rounded-2xl border-2 border-zinc-950 dark:border-white bg-zinc-50 dark:bg-zinc-900 font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 rtl:space-x-reverse">
+              <span>العربية 🇸🇦 (RTL)</span>
+            </button>
+            <button type="button" onclick="setSiteLanguage('en')" id="site-lang-en" class="lang-btn py-2.5 px-3 rounded-2xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 rtl:space-x-reverse">
+              <span>English 🇺🇸 (LTR)</span>
+            </button>
+            <button type="button" onclick="setSiteLanguage('fr')" id="site-lang-fr" class="lang-btn py-2.5 px-3 rounded-2xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 rtl:space-x-reverse">
+              <span>Français 🇫🇷 (LTR)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Prompt Textarea -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold text-zinc-700 dark:text-zinc-300" data-i18n="promptLabel">فكرة ومواصفات الموقع بالتفصيل:</label>
+            <span class="text-[11px] font-mono text-zinc-400" id="prompt-char-count">0 / 2000</span>
+          </div>
+          <textarea id="prompt-input" rows="4" maxlength="2000" oninput="updateCharCount()" class="w-full bg-slate-50 dark:bg-black border border-zinc-300 dark:border-zinc-800 rounded-2xl p-4 text-sm sm:text-base text-zinc-950 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-black dark:focus:border-white transition-all resize-none leading-relaxed" placeholder="صف موقعك هنا بالتفصيل (مثال: منصة برمجية ذكية لشركات التقنية، بتصميم أبيض وأسود فخم، خطوط عربية أنيقة، وباقات اشتراك سنوية)..."></textarea>
+        </div>
+
+        <!-- Quick Presets Carousel -->
+        <div>
+          <div class="text-xs font-bold text-zinc-600 dark:text-zinc-400 mb-2" data-i18n="presetsLabel">نماذج جاهزة للانطلاق السريع:</div>
+          <div class="flex flex-wrap gap-2" id="presets-container">
+            <!-- Loaded dynamically from API -->
+          </div>
+        </div>
+
+        <!-- Step 1 Next Button -->
+        <div class="pt-2">
+          <button onclick="goToStep(2)" class="w-full py-4 rounded-full font-black text-sm sm:text-base bg-zinc-950 text-white dark:bg-white dark:text-black hover:opacity-90 active:scale-98 transition-all shadow-xl flex items-center justify-center space-x-2 rtl:space-x-reverse">
+            <span data-i18n="nextToStyleBtn">التالي: تخصيص النمط، الألوان والخطوط</span>
+            <i data-lucide="arrow-left" class="w-5 h-5 rtl:rotate-0 rotate-180"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- STEP 2: STYLES, COLOR PALETTES & FONTS                       -->
+    <!-- ============================================================ -->
+    <section id="step-panel-2" class="step-panel hidden flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full py-4 sm:py-8 space-y-6">
+      
+      <div class="text-center mb-2">
+        <h2 class="text-2xl sm:text-4xl font-black text-zinc-950 dark:text-white tracking-tight mb-2" data-i18n="step2Heading">
+          اختر النمط، لوحة الألوان والخطوط المفضلة
+        </h2>
+        <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400" data-i18n="step2Subheading">
+          يمكنك اختيار أي ستايل تريده أو إدخال لون مخصص، وسيطبق الوكلاء الهوية البصرية بدقة.
+        </p>
+      </div>
+
+      <!-- Color Palette Selection Cards -->
+      <div class="rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 sm:p-7 shadow-xl space-y-6">
+        
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-sm font-black text-zinc-900 dark:text-white" data-i18n="colorThemeLabel">1. نمط الألوان (Color Palette):</label>
+            <span class="text-xs text-zinc-500 font-mono" id="current-theme-name">Monochrome Executive</span>
+          </div>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            
+            <!-- Monochrome -->
+            <button type="button" onclick="selectColorTheme('monochrome')" id="theme-btn-monochrome" class="theme-card p-4 rounded-2xl border-2 border-zinc-950 dark:border-white bg-zinc-50 dark:bg-zinc-900 text-start transition-all">
+              <div class="flex items-center space-x-1.5 rtl:space-x-reverse mb-2">
+                <span class="w-4 h-4 rounded-full bg-black border border-white"></span>
+                <span class="w-4 h-4 rounded-full bg-white border border-zinc-300"></span>
+              </div>
+              <div class="font-bold text-xs text-zinc-950 dark:text-white">أبيض وأسود فاخر</div>
+              <div class="text-[10px] text-zinc-500">Monochrome Executive</div>
+            </button>
+
+            <!-- Tech Blue -->
+            <button type="button" onclick="selectColorTheme('blue')" id="theme-btn-blue" class="theme-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="flex items-center space-x-1.5 rtl:space-x-reverse mb-2">
+                <span class="w-4 h-4 rounded-full bg-blue-600"></span>
+                <span class="w-4 h-4 rounded-full bg-cyan-400"></span>
+              </div>
+              <div class="font-bold text-xs text-zinc-950 dark:text-white">أزرق تقني عصري</div>
+              <div class="text-[10px] text-zinc-500">Deep Tech Blue</div>
+            </button>
+
+            <!-- Emerald -->
+            <button type="button" onclick="selectColorTheme('emerald')" id="theme-btn-emerald" class="theme-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="flex items-center space-x-1.5 rtl:space-x-reverse mb-2">
+                <span class="w-4 h-4 rounded-full bg-emerald-500"></span>
+                <span class="w-4 h-4 rounded-full bg-teal-400"></span>
+              </div>
+              <div class="font-bold text-xs text-zinc-950 dark:text-white">زمردي أنيق</div>
+              <div class="text-[10px] text-zinc-500">Emerald Obsidian</div>
+            </button>
+
+            <!-- Violet -->
+            <button type="button" onclick="selectColorTheme('purple')" id="theme-btn-purple" class="theme-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="flex items-center space-x-1.5 rtl:space-x-reverse mb-2">
+                <span class="w-4 h-4 rounded-full bg-purple-600"></span>
+                <span class="w-4 h-4 rounded-full bg-pink-500"></span>
+              </div>
+              <div class="font-bold text-xs text-zinc-950 dark:text-white">بنفسجي سايبر</div>
+              <div class="text-[10px] text-zinc-500">Cyber Violet</div>
+            </button>
+
+            <!-- Amber / Gold -->
+            <button type="button" onclick="selectColorTheme('amber')" id="theme-btn-amber" class="theme-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="flex items-center space-x-1.5 rtl:space-x-reverse mb-2">
+                <span class="w-4 h-4 rounded-full bg-amber-500"></span>
+                <span class="w-4 h-4 rounded-full bg-orange-400"></span>
+              </div>
+              <div class="font-bold text-xs text-zinc-950 dark:text-white">ذهبي دافئ</div>
+              <div class="text-[10px] text-zinc-500">Sunset Gold</div>
+            </button>
+
+            <!-- Crimson Ruby -->
+            <button type="button" onclick="selectColorTheme('crimson')" id="theme-btn-crimson" class="theme-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="flex items-center space-x-1.5 rtl:space-x-reverse mb-2">
+                <span class="w-4 h-4 rounded-full bg-rose-600"></span>
+                <span class="w-4 h-4 rounded-full bg-red-400"></span>
+              </div>
+              <div class="font-bold text-xs text-zinc-950 dark:text-white">أحمر قرمزي</div>
+              <div class="text-[10px] text-zinc-500">Crimson Ruby</div>
+            </button>
+
+            <!-- Clean Light -->
+            <button type="button" onclick="selectColorTheme('light-clean')" id="theme-btn-light-clean" class="theme-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="flex items-center space-x-1.5 rtl:space-x-reverse mb-2">
+                <span class="w-4 h-4 rounded-full bg-zinc-100 border border-zinc-300"></span>
+                <span class="w-4 h-4 rounded-full bg-zinc-900"></span>
+              </div>
+              <div class="font-bold text-xs text-zinc-950 dark:text-white">أبيض نقي ومينيمال</div>
+              <div class="text-[10px] text-zinc-500">Pure Minimalist</div>
+            </button>
+
+            <!-- Custom Brand Color -->
+            <div class="theme-card p-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col justify-between">
+              <div class="font-bold text-xs text-zinc-950 dark:text-white mb-1">لون مخصص (Custom)</div>
+              <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                <input type="color" id="custom-color-picker" value="#3b82f6" onchange="onCustomColorChange(this.value)" class="w-8 h-8 rounded-xl border-0 cursor-pointer p-0 bg-transparent">
+                <input type="text" id="custom-color-hex" value="#3b82f6" maxlength="7" oninput="onCustomColorChange(this.value)" class="flex-1 bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-2 py-1 text-[11px] font-mono text-zinc-950 dark:text-white">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Typography / Font Pairings -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-sm font-black text-zinc-900 dark:text-white" data-i18n="fontLabel">2. الخطوط ونمط الكتابة (Typography):</label>
+            <span class="text-xs text-zinc-500 font-mono" id="current-font-name">IBM Plex Sans Arabic</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            
+            <button type="button" onclick="selectFontFamily('ibm-plex')" id="font-btn-ibm-plex" class="font-card p-4 rounded-2xl border-2 border-zinc-950 dark:border-white bg-zinc-50 dark:bg-zinc-900 text-start transition-all">
+              <div class="text-base font-bold text-zinc-950 dark:text-white mb-1" style="font-family: 'IBM Plex Sans Arabic', sans-serif;">تجربة الخط العربي</div>
+              <div class="text-xs text-zinc-600 dark:text-zinc-400">IBM Plex Sans Arabic</div>
+              <div class="text-[10px] text-zinc-400">موصى به للمنصات البرمجية والشركات</div>
+            </button>
+
+            <button type="button" onclick="selectFontFamily('cairo')" id="font-btn-cairo" class="font-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="text-base font-bold text-zinc-950 dark:text-white mb-1" style="font-family: 'Cairo', sans-serif;">تجربة الخط العربي</div>
+              <div class="text-xs text-zinc-600 dark:text-zinc-400">Cairo & Inter</div>
+              <div class="text-[10px] text-zinc-400">عصري، واضح وجريء للمتاجر</div>
+            </button>
+
+            <button type="button" onclick="selectFontFamily('alexandria')" id="font-btn-alexandria" class="font-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="text-base font-bold text-zinc-950 dark:text-white mb-1" style="font-family: 'Alexandria', sans-serif;">تجربة الخط العربي</div>
+              <div class="text-xs text-zinc-600 dark:text-zinc-400">Alexandria & Geist</div>
+              <div class="text-[10px] text-zinc-400">هندسي فخم للشركات الناشئة</div>
+            </button>
+
+            <button type="button" onclick="selectFontFamily('tajawal')" id="font-btn-tajawal" class="font-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="text-base font-bold text-zinc-950 dark:text-white mb-1" style="font-family: 'Tajawal', sans-serif;">تجربة الخط العربي</div>
+              <div class="text-xs text-zinc-600 dark:text-zinc-400">Tajawal & Roboto</div>
+              <div class="text-[10px] text-zinc-400">انسيابي وسريع القراءة</div>
+            </button>
+
+            <button type="button" onclick="selectFontFamily('amiri')" id="font-btn-amiri" class="font-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="text-base font-bold text-zinc-950 dark:text-white mb-1" style="font-family: 'Amiri', serif;">تجربة الخط العربي</div>
+              <div class="text-xs text-zinc-600 dark:text-zinc-400">Amiri (كلاسيكي فاخر)</div>
+              <div class="text-[10px] text-zinc-400">مثالي للعلامات الراقية والعطور</div>
+            </button>
+
+            <button type="button" onclick="selectFontFamily('outfit')" id="font-btn-outfit" class="font-card p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-start hover:border-zinc-400 transition-all">
+              <div class="text-base font-bold text-zinc-950 dark:text-white mb-1" style="font-family: 'Outfit', sans-serif;">تجربة الخط العربي</div>
+              <div class="text-xs text-zinc-600 dark:text-zinc-400">Outfit & Readex Pro</div>
+              <div class="text-[10px] text-zinc-400">عالمي وتفاعلي للمشاريع الرقمية</div>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Step 2 Actions -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+          <button onclick="goToStep(1)" class="w-full sm:w-auto px-6 py-3.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs sm:text-sm font-bold text-zinc-700 dark:text-zinc-300 hover:border-zinc-500 transition-all flex items-center justify-center space-x-1.5 rtl:space-x-reverse">
+            <i data-lucide="arrow-right" class="w-4 h-4 rtl:rotate-0 rotate-180"></i>
+            <span data-i18n="backBtn">السابق: الفكرة واللغة</span>
+          </button>
+          <button id="generate-btn" onclick="startGeneration()" class="w-full sm:flex-1 py-4 rounded-full font-black text-sm sm:text-base bg-zinc-950 text-white dark:bg-white dark:text-black hover:opacity-90 active:scale-98 transition-all shadow-xl flex items-center justify-center space-x-2 rtl:space-x-reverse">
+            <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i>
+            <span id="generate-btn-text" data-i18n="launchAgentsBtn">إطلاق منظومة الوكلاء السبعة (Gemini 3.1 Flash-Lite) ✦</span>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- STEP 3: 7 AGENTS CHAMBER & LIVE REASONING                    -->
+    <!-- ============================================================ -->
+    <section id="step-panel-3" class="step-panel hidden flex-1 flex flex-col space-y-6 py-4">
+      
+      <!-- Chamber Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800 gap-4">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-black text-zinc-950 dark:text-white flex items-center space-x-2 rtl:space-x-reverse">
+            <span data-i18n="chamberTitle">غرفة مداولات وتنسيق الوكلاء السبعة</span>
+            <span class="text-xs px-2.5 py-0.5 rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-mono" id="agents-live-counter">0/7 مكتمل</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1" data-i18n="chamberSub">
+            يقوم الوكلاء بالتحليل، التخطيط، كتابة المحتوى، وبرمجة الواجهة مع الفحص والإصلاح الذاتي.
+          </p>
+        </div>
+
+        <button onclick="goToStep(4)" class="px-5 py-2.5 rounded-full border border-zinc-300 dark:border-zinc-800 hover:border-zinc-500 text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-200 hover:text-black dark:hover:text-white transition-all flex items-center space-x-2 rtl:space-x-reverse self-start sm:self-auto shadow-sm">
+          <span data-i18n="goToPreviewBtn">الانتقال للمعاينة المباشرة</span>
+          <i data-lucide="arrow-left" class="w-4 h-4 rtl:rotate-0 rotate-180"></i>
+        </button>
+      </div>
+
+      <!-- 7 Agents Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="agents-cards-grid">
+        
+        <!-- 1. Orchestrator -->
+        <div id="card-orchestrator" class="agent-box rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col justify-between transition-all shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
+              <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-sm">👑</div>
+              <div>
+                <h4 class="text-sm font-bold text-zinc-950 dark:text-white">الوكيل المدير (Orchestrator)</h4>
+                <div class="text-[11px] text-zinc-500">تحليل وتنسيق خطة العمل الشاملة</div>
+              </div>
+            </div>
+            <span class="agent-badge text-[10px] px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-400">بانتظار البدء</span>
+          </div>
+          <p class="agent-msg text-xs text-zinc-600 dark:text-zinc-400 font-mono leading-relaxed mt-2">خامل حالياً</p>
+        </div>
+
+        <!-- 2. Architect -->
+        <div id="card-architect" class="agent-box rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col justify-between transition-all shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
+              <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-sm">📐</div>
+              <div>
+                <h4 class="text-sm font-bold text-zinc-950 dark:text-white">مهندس الهيكلة (Site Architect)</h4>
+                <div class="text-[11px] text-zinc-500">تخطيط الأقسام وشبكة التجاوب</div>
+              </div>
+            </div>
+            <span class="agent-badge text-[10px] px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-400">بانتظار البدء</span>
+          </div>
+          <p class="agent-msg text-xs text-zinc-600 dark:text-zinc-400 font-mono leading-relaxed mt-2">خامل حالياً</p>
+        </div>
+
+        <!-- 3. Designer -->
+        <div id="card-designer" class="agent-box rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col justify-between transition-all shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
+              <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-sm">🎨</div>
+              <div>
+                <h4 class="text-sm font-bold text-zinc-950 dark:text-white">مصمم الواجهات (UI Designer)</h4>
+                <div class="text-[11px] text-zinc-500">تطبيق الهوية البصرية والألوان</div>
+              </div>
+            </div>
+            <span class="agent-badge text-[10px] px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-400">بانتظار البدء</span>
+          </div>
+          <p class="agent-msg text-xs text-zinc-600 dark:text-zinc-400 font-mono leading-relaxed mt-2">خامل حالياً</p>
+        </div>
+
+        <!-- 4. Copywriter -->
+        <div id="card-copywriter" class="agent-box rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col justify-between transition-all shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
+              <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-sm">✍️</div>
+              <div>
+                <h4 class="text-sm font-bold text-zinc-950 dark:text-white">كاتب المحتوى (Copywriter)</h4>
+                <div class="text-[11px] text-zinc-500">صياغة نصوص تسويقية حقيقية</div>
+              </div>
+            </div>
+            <span class="agent-badge text-[10px] px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-400">بانتظار البدء</span>
+          </div>
+          <p class="agent-msg text-xs text-zinc-600 dark:text-zinc-400 font-mono leading-relaxed mt-2">خامل حالياً</p>
+        </div>
+
+        <!-- 5. Media Specialist -->
+        <div id="card-media" class="agent-box rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col justify-between transition-all shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
+              <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-sm">🖼️</div>
+              <div>
+                <h4 class="text-sm font-bold text-zinc-950 dark:text-white">مسؤول الأيقونات (Asset Specialist)</h4>
+                <div class="text-[11px] text-zinc-500">تفعيل مكتبة Lucide والصور</div>
+              </div>
+            </div>
+            <span class="agent-badge text-[10px] px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-400">بانتظار البدء</span>
+          </div>
+          <p class="agent-msg text-xs text-zinc-600 dark:text-zinc-400 font-mono leading-relaxed mt-2">خامل حالياً</p>
+        </div>
+
+        <!-- 6. Developer -->
+        <div id="card-developer" class="agent-box rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col justify-between transition-all shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
+              <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-sm">💻</div>
+              <div>
+                <h4 class="text-sm font-bold text-zinc-950 dark:text-white">مهندس الواجهات (Engineer)</h4>
+                <div class="text-[11px] text-zinc-500">كتابة HTML5 و Tailwind و JS</div>
+              </div>
+            </div>
+            <span class="agent-badge text-[10px] px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-400">بانتظار البدء</span>
+          </div>
+          <p class="agent-msg text-xs text-zinc-600 dark:text-zinc-400 font-mono leading-relaxed mt-2">خامل حالياً</p>
+        </div>
+
+        <!-- 7. QA & Self-Correction (Full Width Highlight) -->
+        <div id="card-qa" class="agent-box md:col-span-2 lg:col-span-3 rounded-2xl p-5 border-2 border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 flex flex-col justify-between transition-all shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">🛡️</div>
+              <div>
+                <h4 class="text-sm font-bold text-zinc-950 dark:text-white flex items-center space-x-2 rtl:space-x-reverse">
+                  <span>محرك التدقيق والإصلاح الذاتي (Self-Correction Engine)</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 font-mono border border-emerald-500/30">Auto-Fix Active</span>
+                </h4>
+                <div class="text-[11px] text-zinc-500">يفحص القياسات للهواتف والتلفاز والحواسيب ويصلح الأكواد ذاتياً</div>
+              </div>
+            </div>
+            <span class="agent-badge text-[10px] px-2.5 py-1 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-500 font-bold">بانتظار الفحص</span>
+          </div>
+          <p class="agent-msg text-xs text-zinc-600 dark:text-zinc-400 font-mono leading-relaxed mt-2">سيتم الفحص الذاتي فور اكتمال كتابة الكود.</p>
+        </div>
+
+      </div>
+
+      <!-- Live Terminal Feed -->
+      <div class="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 font-mono text-xs shadow-sm">
+        <div class="flex items-center justify-between text-zinc-500 pb-2 mb-2 border-b border-zinc-100 dark:border-zinc-900">
+          <span class="flex items-center space-x-2 rtl:space-x-reverse">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="font-bold text-zinc-800 dark:text-zinc-200">البث المباشر لأفكار الوكلاء (Live Thought Stream)</span>
+          </span>
+          <button onclick="clearTerminal()" class="text-[10px] hover:text-black dark:hover:text-white">مسح السجل</button>
+        </div>
+        <div id="terminal-feed" class="h-44 overflow-y-auto space-y-1.5 text-zinc-700 dark:text-zinc-300">
+          <div class="text-zinc-400 dark:text-zinc-600">// في انتظار إطلاق المشروع لمتابعة تفكير الوكلاء خطوة بخطوة...</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- STEP 4: LIVE CANVAS, CODE INSPECTOR & EXPORT STUDIO          -->
+    <!-- ============================================================ -->
+    <section id="step-panel-4" class="step-panel hidden flex-1 flex flex-col space-y-4 py-2">
+      
+      <!-- Studio Control Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
+        
+        <!-- Viewport Switcher for All Screen Sizes (Mobile, Tablet, PC, TV) -->
+        <div class="flex items-center space-x-1 rtl:space-x-reverse bg-zinc-100 dark:bg-black p-1 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs">
+          <button id="vp-mobile" onclick="setDeviceViewport('mobile')" class="px-2.5 sm:px-3 py-1.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white flex items-center space-x-1.5 rtl:space-x-reverse" title="قياسات الهاتف الذكي">
+            <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">هاتف</span>
+          </button>
+          <button id="vp-tablet" onclick="setDeviceViewport('tablet')" class="px-2.5 sm:px-3 py-1.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white flex items-center space-x-1.5 rtl:space-x-reverse" title="قياسات الجهاز اللوحي">
+            <i data-lucide="tablet" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">تابلت</span>
+          </button>
+          <button id="vp-desktop" onclick="setDeviceViewport('desktop')" class="px-2.5 sm:px-3 py-1.5 rounded-full bg-zinc-950 text-white dark:bg-white dark:text-black font-bold flex items-center space-x-1.5 rtl:space-x-reverse" title="قياسات الحاسوب">
+            <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">حاسوب</span>
+          </button>
+          <button id="vp-tv" onclick="setDeviceViewport('tv')" class="px-2.5 sm:px-3 py-1.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white flex items-center space-x-1.5 rtl:space-x-reverse" title="قياسات شاشات التلفاز والشاشات العريضة">
+            <i data-lucide="tv" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">تلفاز / 4K</span>
+          </button>
+        </div>
+
+        <!-- Mode Tabs -->
+        <div class="flex items-center space-x-1 rtl:space-x-reverse bg-zinc-100 dark:bg-black p-1 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">
+          <button id="mode-tab-canvas" onclick="setCanvasMode('canvas')" class="px-3.5 py-1.5 rounded-full bg-zinc-950 text-white dark:bg-zinc-800 font-bold">المعاينة الحية</button>
+          <button id="mode-tab-code" onclick="setCanvasMode('code')" class="px-3.5 py-1.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white">الكود النقي</button>
+          <button id="mode-tab-audit" onclick="setCanvasMode('audit')" class="px-3.5 py-1.5 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white">تقرير الجودة 100/100</button>
+        </div>
+
+        <!-- Quick Actions & Export Buttons -->
+        <div class="flex items-center space-x-2 rtl:space-x-reverse">
+          <button onclick="openExternalWindow()" title="فتح في نافذة كاملة مستقلة" class="p-2 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-black text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition-all">
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+          </button>
+          <button onclick="copyGeneratedCode()" title="نسخ الكود كاملاً" class="p-2 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-black text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition-all">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+          </button>
+          <button onclick="downloadHtmlFile()" title="تحميل ملف HTML" class="px-3 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-800 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all">
+            تحميل HTML
+          </button>
+          <button onclick="downloadZipArchive()" title="تصدير كحزمة ZIP متكاملة" class="px-3.5 sm:px-4 py-1.5 rounded-full bg-zinc-950 text-white dark:bg-white dark:text-black font-bold text-xs hover:opacity-90 transition-all flex items-center space-x-1 rtl:space-x-reverse shadow-md">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>تصدير ZIP</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Preview Stage Container -->
+      <div class="flex-1 min-h-[580px] sm:min-h-[640px] bg-zinc-100 dark:bg-black rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex items-center justify-center p-2 sm:p-4 relative">
+        
+        <!-- Live Frame Mockup -->
+        <div id="canvas-container" class="w-full h-full rounded-2xl overflow-hidden border border-zinc-300 dark:border-zinc-800 shadow-2xl transition-all duration-300 flex flex-col bg-white dark:bg-zinc-950 device-desktop">
+          <div class="h-9 bg-zinc-100 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-4 flex items-center justify-between">
+            <div class="flex items-center space-x-1.5 rtl:space-x-reverse">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            </div>
+            <div id="live-url-display" class="text-xs text-zinc-500 font-mono truncate px-4">
+              http://localhost:3000/api/site/...
+            </div>
+            <button onclick="reloadCanvas()" class="text-zinc-500 hover:text-black dark:hover:text-white" title="إعادة تحميل المعاينة">
+              <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <iframe id="live-iframe" class="w-full flex-1 border-0 bg-white dark:bg-black" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" src="about:blank"></iframe>
+        </div>
+
+        <!-- Raw Code Inspector -->
+        <div id="code-inspector" class="hidden w-full h-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 overflow-auto">
+          <pre id="raw-code-text" class="text-xs font-mono text-zinc-800 dark:text-zinc-200 leading-relaxed select-all"></pre>
+        </div>
+
+        <!-- Audit & Self-Correction Report -->
+        <div id="audit-inspector" class="hidden w-full h-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 overflow-y-auto">
+          <div id="audit-report-container"></div>
+        </div>
+
+      </div>
+
+      <!-- Refinement / Modification Bar -->
+      <div class="p-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex items-center gap-2 shadow-sm">
+        <input type="text" id="refinement-input" placeholder="اطلب تعديلاً إضافياً على الموقع المولد (مثال: أضف معرض صور، أو اجعل الباقات تقبل الدفع السنوي)..." class="flex-1 bg-slate-50 dark:bg-black border border-zinc-300 dark:border-zinc-800 rounded-full px-4 py-2.5 text-xs text-zinc-950 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-black dark:focus:border-white">
+        <button onclick="requestRefinement()" class="px-5 py-2.5 rounded-full bg-zinc-950 text-white dark:bg-white dark:text-black font-bold text-xs hover:opacity-90 transition-all flex items-center space-x-1.5 rtl:space-x-reverse shadow-md">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          <span>تطبيق التعديل بالوكلاء</span>
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Network Info Modal (Phone & Local Wi-Fi Network Access) -->
+  <div id="network-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeNetworkInfoModal()" class="absolute top-5 left-5 rtl:left-auto rtl:right-5 p-2 rounded-full text-zinc-400 hover:text-black dark:hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      
+      <div class="flex items-center space-x-2.5 rtl:space-x-reverse mb-4">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+          <i data-lucide="wifi" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-zinc-950 dark:text-white">الاتصال الداخلي والشبكة</h3>
+          <p class="text-xs text-zinc-500">للتجربة في نفس الهاتف أو من أي جهاز في نفس شبكة Wi-Fi</p>
+        </div>
+      </div>
+
+      <div class="space-y-3 font-mono text-xs">
+        <div class="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+          <div class="text-[11px] text-zinc-500 mb-1">📱 نفس الهاتف (Local):</div>
+          <div class="flex items-center justify-between">
+            <span id="net-local-url" class="font-bold text-zinc-900 dark:text-white">http://localhost:3000</span>
+            <button onclick="copyText('net-local-url')" class="text-blue-500 hover:underline text-[11px]">نسخ</button>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+          <div class="text-[11px] text-zinc-500 mb-1">🌐 نفس شبكة Wi-Fi (LAN IP):</div>
+          <div class="flex items-center justify-between">
+            <span id="net-lan-url" class="font-bold text-zinc-900 dark:text-white">http://192.168.1.122:3000</span>
+            <button onclick="copyText('net-lan-url')" class="text-blue-500 hover:underline text-[11px]">نسخ</button>
+          </div>
+          <div class="text-[10px] text-zinc-400 mt-1">افتح هذا الرابط في متصفح أي حاسوب أو هاتف متصل بنفس الشبكة.</div>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <button onclick="closeNetworkInfoModal()" class="w-full py-3 rounded-xl font-bold text-xs bg-zinc-950 text-white dark:bg-white dark:text-black">
+          إغلاق
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
